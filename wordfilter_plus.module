@@ -1,0 +1,50 @@
+<?php
+
+/**
+ * @file
+ * Extends wordfilter module to provide node validation.
+ * 
+ * @todo Add a per content type setting (required?)
+ * @todo Make this module work with CCK fields
+ * @todo Provide a more helpful error message that states what words are
+ *       causing the rejection
+ */
+
+/**
+ * Implementation of hook_perm().
+ */
+function wordfilter_plus_perm() {
+  return array('skip banned word check');
+}
+
+/**
+ * Implementation of hook_nodeapi().
+ */
+function wordfilter_plus_nodeapi(&$node, $op, $teaser = NULL, $page = NULL) {
+  switch ($op) {
+    case 'validate':
+      if(!user_access('skip banned word check')) {
+	    // Run node->body through word filter. Any words matching the word filter
+	    // list will be modified.
+	    $filtered_body = wordfilter_filter_process($node->body);
+        
+	    // Compare filtered $node->body to non filtered $node->body.
+	    // If there are different we know that a banned word is present.
+	    if ($node->body != $filtered_body) {
+	      form_set_error('body', t('Body text contains a banned word.'));
+	    }
+
+	    // Run node->title through word filter. Any words matching the word filter
+	    // list will be modified.
+	    $filtered_title = wordfilter_filter_process($node->title);
+        
+	    // Compare filtered $node->title to non filtered $node->title.
+	    // If there are different we know that a banned word is present.
+	    if ($node->title != $filtered_title) {
+	      form_set_error('title', t('Title text contains contains a banned word.'));
+	    }
+	
+	  }
+	break;
+  }
+}

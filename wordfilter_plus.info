@@ -1,0 +1,6 @@
+; $Id$
+name = Word Filter Plus
+description = "Extends wordfilter module to disallow posting of banned words."
+dependencies[] = wordfilter
+package = Custom modules
+core = 6.x
